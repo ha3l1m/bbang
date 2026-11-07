@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- E0509 + RH-P12-RN(A): official Doosan model with the gripper attached to link_6. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="e0509">
+
+  <!-- offset of the gripper mount from link_6 (adjust to the real flange) -->
+  <xacro:arg name="mount_xyz" default="0 0 0"/>
+  <xacro:arg name="mount_rpy" default="0 0 0"/>
+
+  <xacro:include filename="$(find dsr_description2)/xacro/e0509.urdf.xacro"/>
+  <xacro:include filename="$(find rhp12_gripper)/urdf/rh_p12_rn_a.xacro"/>
+
+  <xacro:rh_p12_rn_a parent="link_6" xyz="$(arg mount_xyz)" rpy="$(arg mount_rpy)"/>
+
+</robot>

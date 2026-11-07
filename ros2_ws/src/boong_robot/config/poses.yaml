@@ -1,0 +1,46 @@
+# 다이소 붕어빵 클리커 3개 + 커튼봉(뚜껑 축) + 400ml 소스통 배치 예시  — poses.yaml 을 덮어쓰지 말고 이 파일로 먼저 RViz 테스트하세요.
+#   (rviz_demo: ./run_rviz_demo.sh --poses ../ros2_ws/src/boong_robot/config/poses.clicker.example.yaml)
+# posx: [x, y, z, a, b, c]  (mm, deg, 로봇 베이스 기준). 모든 값은 예시 → 토요일에 티치펜던트로 실측해서 교체.
+#   [.., 0, 180, 0]   툴이 아래        [.., -90, 90, 0]  툴이 수평, -y 방향 (커튼봉 끝 잡기)
+#   [.., 0, 90, 0]    툴이 수평, +x 방향 (소스통 잡기: 로봇 쪽에서 들어가 통을 옆에서 집음)
+speed: {vel_j: 30, acc_j: 30, vel_x: 100, acc_x: 100}
+approach_z: 100
+bake_sec: 3.0
+flip_bake_sec: 3.0
+bottle_lift_mm: 150
+flip_clear_mm: 100
+home: {posj: [0, 0, 90, 0, 90, 0]}
+
+# [시뮬 배치 2026-11-07] 틀이 베이스에 가까우면(x=470) 에뮬레이터에서 팔 자기충돌 → 틀 x=600, 소스통 4개 x=780 · y 110mm 간격 (가장 먼 지점 837mm < 850mm)
+# 소스통 4개: 반죽 · 팥 · 생크림 · 초코 (400ml, 높이 약 210mm·지름 약 65mm 로 가정 → 몸통 가운데 z=105). 맨 앞줄(x=700)에 y 방향으로 나란히.
+batter_bottle:  {posx: [780, -165, 105, 0, 90, 0]}
+redbean_bottle: {posx: [780,  -55, 105, 0, 90, 0]}
+cream_bottle:   {posx: [780,   55, 105, 0, 90, 0]}   # 생크림
+choco_bottle:   {posx: [780,  165, 105, 0, 90, 0]}   # 초코 (4번째 통)
+
+# 클리커 3개 (한쪽 약 길이90 × 폭55, 받침 위에 올려 윗면 z≈75). 칸은 y=-150, -50, 50 (테이블 폭 55cm 에 맞춰 -y 쪽으로 치우쳐 놓아 봉 끝 접근이 테이블 안에 들어오게 함).
+#   mold_dispense = 0번 칸 중앙 위, 뒤집은 통의 노즐이 윗면 20mm 위가 되게: z = 75 + 20 + 통길이/2(105) = 200
+cells: {count: 2, pitch_mm: 115, plate_mm: [50, 90]}   # 틀 2개. 판 하나 = 가로(x) 50 × 세로(y) 90 mm 직사각형, 붕어빵 음각
+mold_dispense: {posx: [600, -150, 200, 0, 90, 0]}
+# 뚜껑 틀(철판, 2026-11-07): 22.5×17cm 석쇠 2장 — 아래 판에 틀 2개의 아래 반쪽, 뚜껑 판에 위 반쪽. 틀 경첩으로 책처럼 닫힘(닫힌 높이 35mm).
+#   철판은 판보다 작은 받침 박스(높이 57.5mm) 위. 경첩(y 방향)은 x=575, 높이 = 판 면 57.5 + 35/2 = 75.
+#   아래 판 = 경첩 +x 쪽(로봇 반대), 뚜껑 판 = 경첩 -x 쪽(로봇 쪽)에 펼쳐 둠.
+#   mold_handle = 뚜껑 판 +y 쪽 가장자리, 경첩에서 80mm (150mm 는 에뮬레이터에서 135°에서 NOT REACHABLE → 80mm 에서 180° 확인). 툴 수평 -y, c=90 → 손가락이 위아래로 판을 문다.
+#   닫기: 경첩 둘레 반원(반지름 80) + J6 180° → 뚜껑 판이 아래 판 위 35mm 에 얹힘. roll_sign: J6 회전 방향(에뮬레이터로 확인)
+frame: {type: plate, plate_mm: [170, 225], grip_r_mm: 80, closed_mm: 35, steps: 8, roll_sign: -1, hook_lift_mm: 0, box_h_mm: 57.5, retreat_mm: [30, 80]}   # 닫은 뒤 비켜서기: 옆(+y) 30 → 위 80
+mold_handle:   {posx: [495, 10, 57.5, -90, 90, 90]}
+bread_pick:    {posx: [600, -150, 70, 0, 180, 0]}   # 0번 칸 붕어빵 (칸마다 y +115)
+bag_drop:      {posx: [300, 190, 300, 0, 180, 0]}
+
+# 재료별 짜기 (점성↑ → 더 닫고 더 오래). 전부 예시
+materials:
+  batter:  {bottle: batter_bottle,  hold: 380, squeeze: 520, squeeze_sec: 1.2}
+  redbean: {bottle: redbean_bottle, hold: 380, squeeze: 620, squeeze_sec: 2.0}
+  cream:   {bottle: cream_bottle,   hold: 380, squeeze: 560, squeeze_sec: 1.6}
+  choco:   {bottle: choco_bottle,   hold: 380, squeeze: 600, squeeze_sec: 1.8}
+
+# 툴 무게·TCP: 펜던트에서 그리퍼(+통) 무게/TCP 를 등록한 뒤 이름을 적으면 시작할 때 선택한다 (E0509 최대 5kg, RH-P12-RN 약 0.5kg + 통).
+#tool: {name: boong_gripper, tcp: boong_tcp}
+# 실로봇: type: drl  (공식 doosan-robot2 + DRL flange_serial, 그리퍼 패키지 불필요). 처음엔 mock.
+#   gripper: {type: drl, namespace: /dsr01, move_wait_sec: 1.0}
+gripper: {type: mock, namespace: /dsr01/gripper, timeout_sec: 5.0, wait_sec: 0.8, close: [[1, 1], [2, 0]]}

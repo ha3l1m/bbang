@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!--
+  Simplified RH-P12-RN(A) model (boxes only, NOT the ROBOTIS mesh).
+  - stroke 106 mm (e-Manual) -> each finger opens 0 .. 0.053 m
+  - dimensions of the palm/fingers are approximate placeholders
+  Joint value q = opening of one finger [m]: 0 = closed, 0.053 = fully open.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="rh_p12_rn_a" params="parent prefix:='' xyz:='0 0 0' rpy:='0 0 0'">
+
+    <xacro:property name="palm_x" value="0.069"/>
+    <xacro:property name="palm_y" value="0.150"/>
+    <xacro:property name="palm_z" value="0.080"/>
+    <xacro:property name="fin_x"  value="0.020"/>
+    <xacro:property name="fin_y"  value="0.014"/>
+    <xacro:property name="fin_z"  value="0.070"/>
+    <xacro:property name="stroke_half" value="0.053"/>
+
+    <material name="${prefix}rhp12_dark"><color rgba="0.15 0.15 0.18 1.0"/></material>
+    <material name="${prefix}rhp12_grey"><color rgba="0.65 0.65 0.70 1.0"/></material>
+
+    <link name="${prefix}rhp12_base_link">
+      <visual>
+        <origin xyz="0 0 ${palm_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${palm_x} ${palm_y} ${palm_z}"/></geometry>
+        <material name="${prefix}rhp12_dark"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${palm_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${palm_x} ${palm_y} ${palm_z}"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 ${palm_z/2}" rpy="0 0 0"/>
+        <mass value="0.5"/>
+        <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}rhp12_mount_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}rhp12_base_link"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </joint>
+
+    <!-- left finger: +y side, opens toward +y -->
+    <link name="${prefix}rhp12_finger_l">
+      <visual>
+        <origin xyz="0 ${fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${fin_x} ${fin_y} ${fin_z}"/></geometry>
+        <material name="${prefix}rhp12_grey"/>
+      </visual>
+      <collision>
+        <origin xyz="0 ${fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${fin_x} ${fin_y} ${fin_z}"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 ${fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <mass value="0.05"/>
+        <inertia ixx="1e-5" iyy="1e-5" izz="1e-5" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}rhp12_finger_l_joint" type="prismatic">
+      <parent link="${prefix}rhp12_base_link"/>
+      <child link="${prefix}rhp12_finger_l"/>
+      <origin xyz="0 0 ${palm_z}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="0.0" upper="${stroke_half}" effort="50" velocity="0.2"/>
+    </joint>
+
+    <!-- right finger: -y side, opens toward -y -->
+    <link name="${prefix}rhp12_finger_r">
+      <visual>
+        <origin xyz="0 ${-fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${fin_x} ${fin_y} ${fin_z}"/></geometry>
+        <material name="${prefix}rhp12_grey"/>
+      </visual>
+      <collision>
+        <origin xyz="0 ${-fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <geometry><box size="${fin_x} ${fin_y} ${fin_z}"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 ${-fin_y/2} ${fin_z/2}" rpy="0 0 0"/>
+        <mass value="0.05"/>
+        <inertia ixx="1e-5" iyy="1e-5" izz="1e-5" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}rhp12_finger_r_joint" type="prismatic">
+      <parent link="${prefix}rhp12_base_link"/>
+      <child link="${prefix}rhp12_finger_r"/>
+      <origin xyz="0 0 ${palm_z}" rpy="0 0 0"/>
+      <axis xyz="0 -1 0"/>
+      <limit lower="0.0" upper="${stroke_half}" effort="50" velocity="0.2"/>
+    </joint>
+
+    <!-- tool center point between the fingertips -->
+    <link name="${prefix}rhp12_tcp"/>
+    <joint name="${prefix}rhp12_tcp_joint" type="fixed">
+      <parent link="${prefix}rhp12_base_link"/>
+      <child link="${prefix}rhp12_tcp"/>
+      <origin xyz="0 0 ${palm_z + fin_z*0.8}" rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- E0509 + official ROBOTIS RH-P12-RN(A) (rh_p12_rn_a_description) attached to link_6. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="e0509">
+
+  <!-- offset of the gripper base from link_6 (tool flange). Adjust to the real mounting. -->
+  <xacro:arg name="mount_xyz" default="0 0 0"/>
+  <xacro:arg name="mount_rpy" default="0 0 0"/>
+
+  <xacro:include filename="$(find dsr_description2)/xacro/e0509.urdf.xacro"/>
+  <xacro:include filename="$(find rh_p12_rn_a_description)/urdf/rh_p12_rn_a.xacro"/>
+
+  <xacro:rh_p12_rn_a prefix=""/>
+
+  <joint name="link_6_to_gripper" type="fixed">
+    <parent link="link_6"/>
+    <child link="rh_p12_rn_base"/>
+    <origin xyz="$(arg mount_xyz)" rpy="$(arg mount_rpy)"/>
+  </joint>
+
+</robot>
